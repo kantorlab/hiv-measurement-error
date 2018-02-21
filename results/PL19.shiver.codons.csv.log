@@ -1,0 +1,16 @@
+# hmmbuild :: profile HMM construction from multiple sequence alignments
+# HMMER 3.1b2 (February 2015); http://hmmer.org/
+# Copyright (C) 2015 Howard Hughes Medical Institute.
+# Freely distributed under the GNU General Public License (GPLv3).
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# input alignment file:             scratch/PL19.shiver/ref.pol.fa
+# output HMM file:                  scratch/PL19.shiver/ref.pol.hmm
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# idx name                  nseq  alen  mlen     W eff_nseq re/pos description
+#---- -------------------- ----- ----- ----- ----- -------- ------ -----------
+1     ref.pol               3249  1822  1618  2069     1.74  0.449 
+
+# CPU time: 1.09u 0.05s 00:00:01.14 Elapsed: 00:00:01.14
+780304 reads
+780304 passed

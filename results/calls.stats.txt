@@ -1,0 +1,3 @@
+results/5VM.calls.csv KruskalResult(statistic=0.23033163090125297, pvalue=0.89121835388127968)
+results/PL11.calls.csv KruskalResult(statistic=9.8085535192963432e-13, pvalue=0.99999999999950961)
+results/PL19.calls.csv KruskalResult(statistic=0.0073824031639299348, pvalue=0.99631560252823903)
