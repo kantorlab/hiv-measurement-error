@@ -2,10 +2,8 @@
 set -e
 
 PY=$1
-BAM1=$2
-BAM2=$3
-OUT=$4
-TMP=$2.csv
+DIR=$2
+OUT=$3
 
-python $PY $BAM1 $BAM2 >$TMP
-mv $TMP $OUT
+python $PY $DIR/align.bam >${OUT}~
+mv ${OUT}~ $OUT

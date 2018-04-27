@@ -1,6 +1,6 @@
 CPU = 16
 
-# Reference
+# Reference data
 
 scratch/pol: lib/hmmbuild.sh data/ref.pol.fa
 	$^ $@ &>$@.log
@@ -16,43 +16,46 @@ scratch/PrimerID: lib/pid-install.sh
 
 # Data sets
 
-scratch/5VM: lib/download.sh
+scratch/data.5VM: lib/download.sh
 	$< SRR961514 5VM &>$@.log
 	touch $@
 
-scratch/PL11: lib/download.sh
+scratch/data.PL11: lib/download.sh
 	$< SRR6725661 PL11 &>$@.log
 	touch $@
 
-scratch/PL19: lib/download.sh
+scratch/data.PL19: lib/download.sh
 	$< SRR6725662 PL19 &>$@.log
 	touch $@
 
-scratch/PID.download: lib/pid-download.sh
+scratch/download.PID: lib/pid-download.sh
 	$< &>$@.log
 	touch $@
 
-scratch/PID.link: lib/pid-link.sh scratch/PrimerID scratch/PID.download
+scratch/link.PID: lib/pid-link.sh scratch/PrimerID scratch/download.PID
 	$< &>$@.log
 	touch $@
 
-scratch/PID.$(ID): lib/pid-align.sh scratch/PID.link
+scratch/pidalyse.$(ID): lib/pid-align.sh scratch/link.PID
 	$< $(ID) $(CPU) &>$@.log
 	touch $@
 
-scratch/PID: lib/pid-reads.sh scratch/PID.3223a scratch/PID.3223b scratch/PID.3223c scratch/PID.3236a scratch/PID.3236b scratch/PID.3236c
+scratch/data.PID: lib/pid-reads.sh scratch/pidalyse.3223a scratch/pidalyse.3223b scratch/pidalyse.3223c scratch/pidalyse.3236a scratch/pidalyse.3236b scratch/pidalyse.3236c
 	$< &>$@.log
 	touch $@
 
 # Intermediate files
 
-scratch/$(ID).iva: lib/iva.sh scratch/$(ID)
+scratch/hydra.$(ID): lib/hydra.sh scratch/data.$(ID)
 	$< $(ID) $(CPU) &>$@.log
 
-scratch/$(ID).shiver: lib/shiver.sh scratch/shiver scratch/$(ID).iva scratch/pol
+scratch/iva.$(ID): lib/iva.sh scratch/data.$(ID)
+	$< $(ID) $(CPU) &>$@.log
+
+scratch/shiver.$(ID): lib/shiver.sh scratch/shiver scratch/iva.$(ID) scratch/pol
 	$< $(ID) &>$@.log
 
-scratch/$(ID).coverage: lib/coverage.sh data/hxb2.fa scratch/$(ID)
+scratch/coverage.$(ID): lib/coverage.sh data/hxb2.fa scratch/data.$(ID)
 	$< $(ID) data/hxb2.fa $(CPU) &>$@.log
 	touch $@
 
@@ -68,26 +71,28 @@ scratch/model-cv: lib/model-cv.py scratch/model.5VM scratch/model.PL11 scratch/m
 	python $< $(CPU) &>$@.log
 	touch $@
 
-# Results
+# Results - codon tables
 
-results/PID.hivmmer.codons.csv: lib/hivmmer.sh scratch/PID scratch/pol
-	$^ $(CPU) scratch/PID.hmmsearch2.codons.csv &>$@.log
+results/PID.hivmmer.codons.csv: lib/hivmmer.sh scratch/data.PID scratch/pol
+	$< PID scratch/pol $(CPU) scratch/PID.hmmsearch2.codons.csv &>$@.log
 	mv scratch/PID.hmmsearch1.codons.csv $@
 
 results/PID.hivmmer-ml.codons.csv: lib/model-codons.sh lib/model-codons.py scratch/model.PID scratch/model-cv
 	$^ PID $@ &>$@.log
 
-results/$(ID).hivmmer.codons.csv: lib/hivmmer.sh scratch/$(ID) scratch/pol
-	$^ $(CPU) $@ &>$@.log
+results/$(ID).hivmmer.codons.csv: lib/hivmmer.sh scratch/data.$(ID) scratch/pol
+	$< $(ID) scratch/pol $(CPU) $@ &>$@.log
 
-results/$(ID).shiver.codons.csv: lib/shiver-codons.sh lib/shiver-codons.py scratch/$(ID).shiver
+results/$(ID).shiver.codons.csv: lib/shiver-codons.sh lib/shiver-codons.py scratch/shiver.$(ID)
 	$< $(ID) $@ &>$@.log
 
-results/$(ID).hydra.codons.csv: lib/hydra-codons.sh lib/hydra-codons.py scratch/hydra/$(ID)_1.align.bam scratch/hydra/$(ID)_2.align.bam
+results/$(ID).hydra.codons.csv: lib/hydra-codons.sh lib/hydra-codons.py scratch/hydra.$(ID)
 	$^ $@ &>$@.log
 
-results/PID.pidalyse.codons.csv: lib/pid-codons.sh lib/pid-codons.py scratch/PID
+results/PID.pidalyse.codons.csv: lib/pid-codons.sh lib/pid-codons.py scratch/data.PID
 	$^ $@ &>$@.log
+
+# Results - call distributions
 
 results/PID.calls.csv: lib/calls.py data/PID.ref.fa results/PID.hivmmer.codons.csv results/PID.hydra.codons.csv results/PID.pidalyse.codons.csv
 	python $< PID hivmmer hivmmer-ml hydra pidalyse &>$@.log
@@ -101,13 +106,17 @@ results/calls.stats.txt: lib/stat-calls.py results/5VM.calls.csv results/PL11.ca
 results/calls.eps: lib/plot-calls.py results/5VM.calls.csv results/PL11.calls.csv results/PL19.calls.csv
 	python $< $@ &>$@.log
 
+# Results - alignment details
+
 results/PID-detail.eps: lib/plot-detail.py data/PID.ref.fa results/PID.hivmmer.codons.csv results/PID.hydra.codons.csv results/PID.pidalyse.codons.csv
 	python $< PID hivmmer hivmmer-ml hydra pidalyse &>$@.log
 
 results/$(ID)-detail.eps: lib/plot-detail.py data/$(ID).ref.fa results/$(ID).hivmmer.codons.csv results/$(ID).hydra.codons.csv results/$(ID).shiver.codons.csv
 	python $< $(ID) hivmmer hydra shiver &>$@.log
 
-results/coverage.eps: lib/plot-coverage.py data/hxb2.fa scratch/5VM.coverage
+# Results - remaining plots
+
+results/coverage.eps: lib/plot-coverage.py data/hxb2.fa scratch/coverage.5VM
 	python $< &>$@.log
 
 results/errors.eps: lib/plot-errors.py data/5VM.ref.fa data/PL11.ref.fa data/PL19.ref.fa results/5VM.hivmmer.codons.csv results/5VM.hydra.codons.csv results/5VM.shiver.codons.csv results/PL11.hivmmer.codons.csv results/PL11.hivmmer.codons.csv results/PL11.hydra.codons.csv results/PL11.shiver.codons.csv results/PL19.hivmmer.codons.csv results/PL19.hydra.codons.csv results/PL19.shiver.codons.csv

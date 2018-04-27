@@ -68,7 +68,7 @@ nskipped * 53232
 #---- -------------------- ----- ----- ----- -------- ------ -----------
 1     PL19.hmmsearch1      368438   581   539     6.16  0.590 
 
-# CPU time: 17.76u 1.55s 00:00:19.31 Elapsed: 00:00:19.32
+# CPU time: 18.70u 1.75s 00:00:20.45 Elapsed: 00:00:20.48
 ### STAGE 5: HMMSEARCH, ROUND 2 ###
 # hmmbuild :: profile HMM construction from multiple sequence alignments
 # HMMER 3.1b2 (February 2015); http://hmmer.org/
@@ -84,7 +84,7 @@ nskipped * 53232
 #---- -------------------- ----- ----- ----- -------- ------ -----------
 1     PL19.hmmsearch2      364505   574   539     6.36  0.590 
 
-# CPU time: 15.06u 1.50s 00:00:16.56 Elapsed: 00:00:16.55
+# CPU time: 18.62u 1.65s 00:00:20.27 Elapsed: 00:00:20.29
 ### STAGE 6: CODON TABLE ###
 /users/mhowison/miniconda/envs/hivmmer/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
   BiopythonExperimentalWarning)
