@@ -20,5 +20,5 @@ for a in align:
   if a.id == "B.FR.83.HXB2_LAI_IIIB_BRU.K03455": continue
   aa = Seq.translate(''.join(a.seq[i] for i in coords).replace('-', 'N'))
   if not "*" in aa:
-    print ">%s" % a.description
-    print aa
+    print(">%s" % a.description)
+    print(aa)
