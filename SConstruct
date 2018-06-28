@@ -39,9 +39,9 @@ for dataset, accession in datasets.items():
 
 # Software installs
 
-#env.Command("scratch/shiver-install.log",
-#            "lib/shiver-install.sh",
-#            "$SOURCE > $TARGET")
+env.Command("scratch/shiver-install.log",
+            "lib/shiver-install.sh",
+            "bash $SOURCE > $TARGET")
 
 # hivmmer
 
