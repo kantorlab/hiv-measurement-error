@@ -2,7 +2,7 @@ ID:  scratch/5VM
 FQ1: scratch/5VM_1.fastq
 FQ2: scratch/5VM_2.fastq
 REF: scratch/pol.hmm
-CPU: 16
+CPU: 8
 ### STAGE 1: PEAR ###
  ____  _____    _    ____ 
 |  _ \| ____|  / \  |  _ \
@@ -28,7 +28,7 @@ Minimum read size after trimming...: 1
 Maximal ratio of uncalled bases....: 1.000000
 Minimum overlap....................: 10
 Scoring method.....................: Scaled score
-Threads............................: 16
+Threads............................: 8
 
 Allocating memory..................: 3,221,225,472 bytes
 Computing empirical frequencies....: DONE
@@ -48,7 +48,7 @@ Unassembled forward reads file.....: scratch/5VM.pear.unassembled.forward.fastq
 Unassembled reverse reads file.....: scratch/5VM.pear.unassembled.reverse.fastq
 ### STAGE 2: FASTX_COLLAPSER ###
 ### STAGE 3: TRANSLATE ###
-/users/mhowison/miniconda/envs/hivmmer/lib/python3.6/site-packages/Bio/Seq.py:2095: BiopythonWarning: Partial codon, len(sequence) not a multiple of three. Explicitly trim the sequence or add trailing N before translation. This may become an error in future.
+/users/mhowison/.local/lib/python3.6/site-packages/Bio/Seq.py:2423: BiopythonWarning: Partial codon, len(sequence) not a multiple of three. Explicitly trim the sequence or add trailing N before translation. This may become an error in future.
   BiopythonWarning)
 nreads 681516
 nskipped N 16985
@@ -61,14 +61,14 @@ nskipped * 125770
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # input alignment file:             scratch/5VM.hmmsearch1.sto
 # output HMM file:                  scratch/5VM.hmmsearch1.hmm
-# number of worker threads:         16
+# number of worker threads:         8
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # idx name                  nseq  alen  mlen eff_nseq re/pos description
 #---- -------------------- ----- ----- ----- -------- ------ -----------
 1     5VM.hmmsearch1       170107   589   539    13.93  0.590 
 
-# CPU time: 7.11u 0.76s 00:00:07.87 Elapsed: 00:00:07.89
+# CPU time: 6.05u 0.73s 00:00:06.77 Elapsed: 00:00:06.79
 ### STAGE 5: HMMSEARCH, ROUND 2 ###
 # hmmbuild :: profile HMM construction from multiple sequence alignments
 # HMMER 3.1b2 (February 2015); http://hmmer.org/
@@ -77,23 +77,25 @@ nskipped * 125770
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # input alignment file:             scratch/5VM.hmmsearch2.sto
 # output HMM file:                  scratch/5VM.hmmsearch2.hmm
-# number of worker threads:         16
+# number of worker threads:         8
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # idx name                  nseq  alen  mlen eff_nseq re/pos description
 #---- -------------------- ----- ----- ----- -------- ------ -----------
 1     5VM.hmmsearch2       171363   585   539    14.78  0.590 
 
-# CPU time: 7.14u 0.78s 00:00:07.92 Elapsed: 00:00:07.93
+# CPU time: 5.83u 0.76s 00:00:06.59 Elapsed: 00:00:06.60
 ### STAGE 6: CODON TABLE ###
-/users/mhowison/miniconda/envs/hivmmer/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
+/users/mhowison/.local/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
   BiopythonExperimentalWarning)
 indexed reads
 parsed hmmer
 hsps: {1: 173529, 2: 270}
-/users/mhowison/miniconda/envs/hivmmer/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
+constructed codon table
+/users/mhowison/.local/lib/python3.6/site-packages/Bio/SearchIO/__init__.py:211: BiopythonExperimentalWarning: Bio.SearchIO is an experimental submodule which may undergo significant changes prior to its future official release.
   BiopythonExperimentalWarning)
 indexed reads
 parsed hmmer
 hsps: {1: 460031, 2: 16369, 3: 119}
+constructed codon table
 ### FINISHED ###

@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "lib/plot-errors.py", line 63, in <module>
+    x, y = load_data(dataset)
+  File "lib/plot-errors.py", line 32, in load_data
+    nrows=xmax)
+  File "/users/mhowison/anaconda3/envs/hivmmer/lib/python3.6/site-packages/pandas/io/parsers.py", line 709, in parser_f
+    return _read(filepath_or_buffer, kwds)
+  File "/users/mhowison/anaconda3/envs/hivmmer/lib/python3.6/site-packages/pandas/io/parsers.py", line 455, in _read
+    data = parser.read(nrows)
+  File "/users/mhowison/anaconda3/envs/hivmmer/lib/python3.6/site-packages/pandas/io/parsers.py", line 1069, in read
+    ret = self._engine.read(nrows)
+  File "/users/mhowison/anaconda3/envs/hivmmer/lib/python3.6/site-packages/pandas/io/parsers.py", line 1839, in read
+    data = self._reader.read(nrows)
+  File "pandas/_libs/parsers.pyx", line 902, in pandas._libs.parsers.TextReader.read
+  File "pandas/_libs/parsers.pyx", line 936, in pandas._libs.parsers.TextReader._read_low_memory
+  File "pandas/_libs/parsers.pyx", line 978, in pandas._libs.parsers.TextReader._read_rows
+  File "pandas/_libs/parsers.pyx", line 965, in pandas._libs.parsers.TextReader._tokenize_rows
+  File "pandas/_libs/parsers.pyx", line 2208, in pandas._libs.parsers.raise_parser_error
+pandas.errors.ParserError: Error tokenizing data. C error: Expected 1 fields in line 5, saw 4
+

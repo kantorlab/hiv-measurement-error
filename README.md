@@ -5,17 +5,17 @@ Scripts to reproduce results from the manuscript:
 ## Conda environment
 
 Compiled Linux 64-bit binaries are available for all dependencies in the
-[hivmmer Anaconda channel](https://anaconda.org/hivmmer).
+[kantorlab Anaconda channel](https://anaconda.org/kantorlab).
 
-To use the packages, first install [Miniconda 3](https://conda.io/miniconda.html).
+To use the packages, first install [Anaconda 3](https://conda.io/miniconda.html).
 Then recreate the `hivmmer` analysis environment from the included environment
 file with the command:
 
-    conda env create -f env.yaml
+    conda create -n hiv-measurement-error -c kantorlab  hivmmer=0.1.1 scons=3.0.1.1
 
 To activate the environment, use:
 
-    source activate hivmmer
+    source activate hiv-measurement-error
 
 ## Scratch directory
 

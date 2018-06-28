@@ -11,7 +11,7 @@ import sys
 from Bio import SeqIO
 from itertools import groupby
 
-methods = ["hydra", "shiver", "hivmmer"]
+methods = ["hydra", "shiver", "hivmmer", "bowtie2", "bowtie2-pear"]
 datasets = ["5VM", "PL1:1", "PL1:9"]
 
 freq_threshold = 0.001
@@ -32,6 +32,7 @@ def load_data(dataset):
                          nrows=xmax)
     errors = []
     for j, row in codons.iterrows():
+      j = int(j)
       row = row / row.sum()
       for codon in row.index:
         if row[codon] >= freq_threshold and (not codon in ref[j]):
