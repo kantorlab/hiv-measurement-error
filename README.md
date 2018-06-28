@@ -11,7 +11,7 @@ To use the packages, first install [Anaconda 3](https://conda.io/miniconda.html)
 Then recreate the `hivmmer` analysis environment from the included environment
 file with the command:
 
-    conda create -n hiv-measurement-error -c kantorlab  hivmmer=0.1.1 scons=3.0.1.1
+    conda create -n hiv-measurement-error -c kantorlab hivmmer=0.1.1 iva=1.0.9 quasitools=0.3.1 scons=3.0.1.1
 
 To activate the environment, use:
 
