@@ -10,7 +10,7 @@ Compiled Linux 64-bit binaries are available for all dependencies in the
 To use the packages, first install [Anaconda 3](https://conda.io/miniconda.html).
 Then recreate the analysis environment with the command:
 
-    conda create -n hiv-measurement-error -c kantorlab blastn=2.7.1 hivmmer=0.1.1 iva=1.0.9 mafft=7.313 quasitools=0.3.1 scons=3.0.1.1 trimmomatic=0.36
+    conda create -n hiv-measurement-error -c kantorlab blastn=2.7.1 hivmmer=0.1.1 iva=1.0.9 mafft=7.313 matplotlib quasitools=0.3.1 scons=3.0.1.1 trimmomatic=0.36
 
 To activate the environment, use:
 

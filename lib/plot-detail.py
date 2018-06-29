@@ -13,8 +13,10 @@ from matplotlib.ticker import FixedLocator
 margin = 1.5
 freq_threshold = 0.1
 
-dataset = sys.argv[1]
-methods = sys.argv[2:]
+dataset  = sys.argv[1]
+reffile  = sys.argv[2]
+csvfiles = sys.argv[3:-1]
+epsfile  = sys.argv[-1]
 
 if dataset == "PID":
   xmax = 319
@@ -22,22 +24,21 @@ else:
   xmax = 348
 
 ref = [set() for i in range(xmax)]
-for seq in SeqIO.parse("data/{}.ref.fa".format(dataset), "fasta"):
+for seq in SeqIO.parse(reffile, "fasta"):
     for i in range(xmax):
         ref[i].add(str(seq.seq[3*i:3*(i+1)]).upper())
 
+methods = [f.split(".")[1] for f in csvfiles]
 codons = {}
 coverage = {}
 norm_coverage = {}
 
-for method in methods:
-    codons[method] = pd.read_csv("results/{}.{}.codons.csv".format(dataset, method),
-                                 index_col="AA_Index",
-                                 nrows=xmax)
+for method, f in zip(methods, csvfiles):
+    codons[method] = pd.read_csv(f, nrows=xmax)
     coverage[method] = codons[method].sum(axis=1)
     norm_coverage[method] = 100.0 / coverage[method]
 
-ymax = max(coverage[method].max() for method in methods)
+ymax = max(coverage[method].max() for method in codons)
 ylim = (0, ymax)
 
 fig, ax = plt.subplots(nrows=2*len(methods), sharex=True, figsize=(15,6*len(methods)),
@@ -103,4 +104,4 @@ for i, method in enumerate(methods):
                 marker=".", facecolor="none")
 
 fig.tight_layout()
-fig.savefig("results/{}-detail.eps".format(dataset))
+fig.savefig(epsfile)

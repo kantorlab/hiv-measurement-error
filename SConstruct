@@ -6,6 +6,7 @@ env = Environment(ENV=os.environ,
                   CPUS=1)
 
 env.CacheDir("cache")
+methods = ["hivmmer", "shiver", "hydra", "bowtie2", "bowtie2-pear"]
 
 # Use the SLURM scheduler to run jobs by default. If you do not have SLURM, set
 # the command to None to disable.
@@ -169,7 +170,7 @@ for dataset, (fq1, fq2) in fastq.items():
                 "bowtie2 --no-mixed --no-discordant --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
                 cpus=8)
 
-# Results - codon tables
+# Codon frequency tables
 
     ## hivmmer
 
@@ -215,6 +216,15 @@ for dataset, (fq1, fq2) in fastq.items():
                 ["lib/pileup.py",
                  Value(2252),
                  "scratch/bowtie2-pear.{}.bam".format(dataset)],
+                "python $SOURCES $TARGET")
+
+# Figures
+
+    ## Supplementary 1-4
+
+    SrunCommand("results/{}-detail.eps".format(dataset),
+                ["lib/plot-detail.py", Value(dataset), "data/{}.ref.fa".format(dataset)] + \
+                ["results/{}.{}.codons.csv".format(dataset, method) for method in methods],
                 "python $SOURCES $TARGET")
 
 # vim: syntax=python expandtab sw=4 ts=4
