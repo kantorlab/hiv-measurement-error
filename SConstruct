@@ -205,6 +205,10 @@ for dataset, (fq1, fq2) in fastq.items():
                  "scratch/bowtie2.{}.bam".format(dataset)],
                 "python $SOURCES $TARGET")
 
+    env.Command("scratch/{}.coverage.tsv".format(dataset),
+                "scratch/bowtie2.{}.bam".format(dataset),
+                "samtools view -f 3 $SOURCE | cut -f 4,6,9 > $TARGET")
+
     ## bowtie2-pear
 
     SrunCommand("results/{}.bowtie2-pear.codons.csv".format(dataset),

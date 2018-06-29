@@ -1,2 +1,0 @@
-lib/plot-detail.py:93: RuntimeWarning: invalid value encountered in double_scalars
-  freq = norm * row[codon]
