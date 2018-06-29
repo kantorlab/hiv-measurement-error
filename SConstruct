@@ -39,11 +39,11 @@ env.Command("scratch/pol.idx",
 
 # Downloads
 
-env.Command("scratch/shiver-1.3.3.zip",
-            Value("https://github.com/ChrisHIV/shiver/archive/v1.3.3.zip"),
+env.Command("scratch/shiver-1.4.1.zip",
+            Value("https://github.com/ChrisHIV/shiver/archive/v1.4.1.zip"),
             "wget -O $TARGET $SOURCE")
 
-accessions = {"5VM":  "SRR961514",
+accessions = {"5VM": "SRR961514",
               "PL11": "SRR6725661",
               "PL19": "SRR6725662"}
 
@@ -63,9 +63,22 @@ fastq = dict((dataset, ("scratch/{}_1.fastq".format(accession), "scratch/{}_2.fa
 
 # Software installs
 
-env.Command("scratch/shiver-install.log",
-            "lib/shiver-install.sh",
-            "bash $SOURCE > $TARGET")
+env.Command(["scratch/shiver/shiver_init.sh",
+             "scratch/shiver/shiver_align_contigs.sh",
+             "scratch/shiver/shiver_map_reads.sh",
+             "scratch/shiver/config.sh"],
+            ["lib/shiver-install.sh",
+             "scratch/shiver-1.4.1.zip"],
+            "bash $SOURCES")
+
+SrunCommand("scratch/shiver/reference.log",
+            ["scratch/shiver/shiver_init.sh",
+             Value("scratch/shiver/reference"),
+             "scratch/shiver/config.sh",
+             "data/HIV1_ALL_2016_2253-3870_DNA.fasta",
+             "data/adapters.fa",
+             "data/primers.fa"],
+            "bash $SOURCES > $TARGET")
 
 # Alignments
 
@@ -88,7 +101,7 @@ for dataset, (fq1, fq2) in fastq.items():
                 "hivmmer --cpu $CPUS $SOURCES",
                 cpus=4)
 
-    ## iva/shiver
+    ## shiver
 
     iva_dir = "scratch/iva.{}".format(dataset)
 
@@ -97,6 +110,36 @@ for dataset, (fq1, fq2) in fastq.items():
                 "iva -t $CPUS $SOURCES {}".format(iva_dir),
                 rmdir=iva_dir,
                 cpus=8)
+
+    shiver_dir = "scratch/shiver.{}".format(dataset)
+
+    SrunCommand(["{}/{}_cut_wRefs.fasta".format(shiver_dir, dataset),
+                 "{}/{}_raw_wRefs.fasta".format(shiver_dir, dataset),
+                 "{}/{}.blast".format(shiver_dir, dataset)],
+                ["lib/shiver-contigs.sh",
+                 Value(shiver_dir),
+                 "scratch/shiver/shiver_align_contigs.sh",
+                 "scratch/shiver/reference.log",
+                 "scratch/shiver/config.sh",
+                 "{}/contigs.fasta".format(iva_dir),
+                 Value(dataset)],
+                "bash $SOURCES",
+                rmdir=shiver_dir)
+
+    SrunCommand(["{}/{}_remap.bam".format(shiver_dir, dataset),
+                 "{}/{}_remap_ref.fasta".format(shiver_dir, dataset)],
+                ["lib/shiver-reads.sh",
+                 Value(shiver_dir),
+                 "scratch/shiver/shiver_map_reads.sh",
+                 "scratch/shiver/reference.log",
+                 "scratch/shiver/config.sh",
+                 "{}/contigs.fasta".format(iva_dir),
+                 Value(dataset),
+                 "{}/{}.blast".format(shiver_dir, dataset),
+                 "{}/{}_cut_wRefs.fasta".format(shiver_dir, dataset),
+                 fq1,
+                 fq2],
+                "bash $SOURCES")
 
     ## hydra
 
@@ -113,7 +156,7 @@ for dataset, (fq1, fq2) in fastq.items():
                 [Value("-x"), "scratch/pol.idx",
                  Value("-1"), fq1,
                  Value("-2"), fq2],
-                "bowtie2 --very-sensitive-local --no-mixed --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
+                "bowtie2 --no-mixed --no-discordant --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
                 cpus=8)
 
     ## bowtie2-pear
@@ -123,9 +166,51 @@ for dataset, (fq1, fq2) in fastq.items():
                  Value("-1"), "scratch/{}.pear.unassembled.forward.fastq".format(dataset),
                  Value("-2"), "scratch/{}.pear.unassembled.reverse.fastq".format(dataset),
                  Value("-U"), "scratch/{}.pear.assembled.fastq".format(dataset)],
-                "bowtie2 --very-sensitive-local --no-mixed --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
+                "bowtie2 --no-mixed --no-discordant --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
                 cpus=8)
 
 # Results - codon tables
+
+    ## hivmmer
+
+    env.Command("results/{}.hivmmer.codons.csv".format(dataset),
+                "scratch/{}.hmmsearch2.codons.csv".format(dataset),
+                "cp $SOURCE $TARGET")
+
+    env.Command("results/{}.hivmmer.aavf".format(dataset),
+                "scratch/{}.hmmsearch2.aavf".format(dataset),
+                "cp $SOURCE $TARGET")
+
+    ## shiver
+
+    SrunCommand("results/{}.shiver.codons.csv".format(dataset),
+                ["lib/pileup.py",
+                 Value(0),
+                 "{}/{}_remap.bam".format(shiver_dir, dataset)],
+                "python $SOURCES $TARGET")
+
+    ## hydra
+
+    SrunCommand("results/{}.hydra.codons.csv".format(dataset),
+                ["lib/pileup.py",
+                 Value(0),
+                 "{}/align.bam".format(hydra_dir)],
+                "python $SOURCES $TARGET")
+
+    ## bowtie2
+
+    SrunCommand("results/{}.bowtie2.codons.csv".format(dataset),
+                ["lib/pileup.py",
+                 Value(2252),
+                 "scratch/bowtie2.{}.bam".format(dataset)],
+                "python $SOURCES $TARGET")
+
+    ## bowtie2-pear
+
+    SrunCommand("results/{}.bowtie2-pear.codons.csv".format(dataset),
+                ["lib/pileup.py",
+                 Value(2252),
+                 "scratch/bowtie2-pear.{}.bam".format(dataset)],
+                "python $SOURCES $TARGET")
 
 # vim: syntax=python expandtab sw=4 ts=4
