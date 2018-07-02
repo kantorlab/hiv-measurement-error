@@ -40,6 +40,10 @@ env.Command("scratch/pol.idx",
 
 # Downloads
 
+env.Command("scratch/primer-id-5vm.zip",
+            Value("https://ndownloader.figshare.com/articles/6713132?private_link=2eadd6e5611560150126"),
+            "wget -O $TARGET $SOURCE")
+
 env.Command("scratch/shiver-1.4.1.zip",
             Value("https://github.com/ChrisHIV/shiver/archive/v1.4.1.zip"),
             "wget -O $TARGET $SOURCE")
@@ -60,7 +64,39 @@ for dataset, accession in accessions.items():
 fastq = dict((dataset, ("scratch/{}_1.fastq".format(accession), "scratch/{}_2.fastq".format(accession)))
              for dataset, accession in accessions.items())
 
-#datasets["PID"] = ["PID"]
+env.Command(["scratch/primer-id-5vm/3223a_R1.fastq.gz",
+             "scratch/primer-id-5vm/3223a_R2.fastq.gz",
+             "scratch/primer-id-5vm/3223b_R1.fastq.gz",
+             "scratch/primer-id-5vm/3223b_R2.fastq.gz",
+             "scratch/primer-id-5vm/3223c_R1.fastq.gz",
+             "scratch/primer-id-5vm/3223c_R2.fastq.gz",
+             "scratch/primer-id-5vm/3236a_R1.fastq.gz",
+             "scratch/primer-id-5vm/3236a_R2.fastq.gz",
+             "scratch/primer-id-5vm/3236b_R1.fastq.gz",
+             "scratch/primer-id-5vm/3236b_R2.fastq.gz",
+             "scratch/primer-id-5vm/3236c_R1.fastq.gz",
+             "scratch/primer-id-5vm/3236c_R2.fastq.gz",
+             "scratch/primer-id-5vm/3223a_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3223b_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3223c_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3236a_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3236b_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3236c_QC_1_cons.fasta"],
+            "scratch/primer-id-5vm.zip",
+            "mkdir -p scratch/primer-id-5vm && unzip -o $SOURCE -d scratch/primer-id-5vm/")
+
+
+for i in (1, 2):
+    env.Command("scratch/PID_{}.fastq".format(i),
+                ["scratch/primer-id-5vm/3223a_R{}.fastq.gz".format(i),
+                 "scratch/primer-id-5vm/3223b_R{}.fastq.gz".format(i),
+                 "scratch/primer-id-5vm/3223c_R{}.fastq.gz".format(i),
+                 "scratch/primer-id-5vm/3236a_R{}.fastq.gz".format(i),
+                 "scratch/primer-id-5vm/3236b_R{}.fastq.gz".format(i),
+                 "scratch/primer-id-5vm/3236c_R{}.fastq.gz".format(i)],
+                "zcat $SOURCES > $TARGET")
+
+fastq["PID"] = ("scratch/PID_1.fastq", "scratch/PID_2.fastq")
 
 # Software installs
 
@@ -156,8 +192,9 @@ for dataset, (fq1, fq2) in fastq.items():
     SrunCommand("scratch/bowtie2.{}.bam".format(dataset),
                 [Value("-x"), "scratch/pol.idx",
                  Value("-1"), fq1,
-                 Value("-2"), fq2],
-                "bowtie2 --no-mixed --no-discordant --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
+                 Value("-2"), fq2,
+                 Value("--no-mixed --no-discordant -X 10000")],
+                "bowtie2 --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
                 cpus=8)
 
     ## bowtie2-pear
@@ -166,8 +203,9 @@ for dataset, (fq1, fq2) in fastq.items():
                 [Value("-x"), "scratch/pol.idx",
                  Value("-1"), "scratch/{}.pear.unassembled.forward.fastq".format(dataset),
                  Value("-2"), "scratch/{}.pear.unassembled.reverse.fastq".format(dataset),
-                 Value("-U"), "scratch/{}.pear.assembled.fastq".format(dataset)],
-                "bowtie2 --no-mixed --no-discordant --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
+                 Value("-U"), "scratch/{}.pear.assembled.fastq".format(dataset),
+                 Value("--no-mixed --no-discordant -X 10000")],
+                "bowtie2 --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
                 cpus=8)
 
 # Codon frequency tables
@@ -206,7 +244,7 @@ for dataset, (fq1, fq2) in fastq.items():
                  "scratch/bowtie2.{}.bam".format(dataset)],
                 "python $SOURCES $TARGET")
 
-    env.Command("scratch/{}.coverage.tsv".format(dataset),
+    env.Command("results/{}.coverage.tsv".format(dataset),
                 "scratch/bowtie2.{}.bam".format(dataset),
                 "samtools view -f 3 $SOURCE | cut -f 4,6,9 > $TARGET")
 
@@ -222,9 +260,23 @@ for dataset, (fq1, fq2) in fastq.items():
 
     ## Supplementary 1-4
 
-    SrunCommand("results/{}-detail.eps".format(dataset),
+    env.Command("results/{}-detail.eps".format(dataset),
                 ["lib/plot-detail.py", Value(dataset), "data/{}.ref.fa".format(dataset)] + \
                 ["results/{}.{}.codons.csv".format(dataset, method) for method in methods],
                 "python $SOURCES $TARGET")
+
+# Figure 1
+
+env.Command("results/coverage.eps",
+            ["lib/plot-coverage.py", "results/5VM.coverage.tsv"],
+            "python $SOURCES $TARGET")
+
+# Figure 2
+
+env.Command("results/errors.eps",
+            ["lib/plot-errors.py", Value(",".join(fastq)), Value(",".join(methods))] + \
+            ["data/{}.ref.fa".format(dataset) for dataset in fastq] + \
+            ["results/{}.{}.codons.csv".format(dataset, method) for method in methods for dataset in fastq],
+            "python $SOURCES $TARGET")
 
 # vim: syntax=python expandtab sw=4 ts=4

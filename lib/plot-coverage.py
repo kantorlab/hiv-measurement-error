@@ -5,27 +5,26 @@ matplotlib.rcParams["font.family"] = "Helvetica"
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import re
 import seaborn as sns
 import sys
-import re
+
+tsvfile = sys.argv[1]
+epsfile = sys.argv[2]
 
 re_cigar = re.compile(r'(\d+)([A-Z]{1})')
-
 fragment_types = ["Replicate", "Overlapping", "Paired"]
-
 hxb2_len = 9719
 xmax = 1200
-
 ops = {"M": 1, "D": 1, "I": 0}
+
 def cigar2len(cigar):
   l = 0
   for n, op in re_cigar.findall(cigar):
       l += ops[op] * int(n)
   return l
 
-raw = pd.read_csv("scratch/5VM.coverage.tsv",
-                  delimiter="\t",
-                  names=["start", "cigar", "fragment"])
+raw = pd.read_csv(tsvfile, delimiter="\t", names=["start", "cigar", "fragment"])
 
 raw["length"] = raw["cigar"].apply(cigar2len)
 raw["fragment"] = np.abs(raw["fragment"])
@@ -58,4 +57,4 @@ ax1.set_xticklabels([0,hxb2_len])
 ax1.legend()
 
 f.tight_layout()
-f.savefig("results/coverage.eps")
+f.savefig(epsfile)
