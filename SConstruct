@@ -7,6 +7,7 @@ env = Environment(ENV=os.environ,
 
 env.CacheDir("cache")
 methods = ["hivmmer", "shiver", "hydra", "bowtie2", "bowtie2-pear"]
+methods = {"5VM": methods, "PL11": methods, "PL19": methods, "PID": ["hivmmer", "pidalyse", "hydra", "bowtie2"]}
 
 # Use the SLURM scheduler to run jobs by default. If you do not have SLURM, set
 # the command to None to disable.
@@ -140,43 +141,45 @@ for dataset, (fq1, fq2) in fastq.items():
 
     ## shiver
 
-    iva_dir = "scratch/iva.{}".format(dataset)
+    if dataset != "PID":
 
-    SrunCommand("{}/contigs.fasta".format(iva_dir),
-                [Value("-f"), fq1, Value("-r"), fq2],
-                "iva -t $CPUS $SOURCES {}".format(iva_dir),
-                rmdir=iva_dir,
-                cpus=8)
+        iva_dir = "scratch/iva.{}".format(dataset)
 
-    shiver_dir = "scratch/shiver.{}".format(dataset)
+        SrunCommand("{}/contigs.fasta".format(iva_dir),
+                    [Value("-f"), fq1, Value("-r"), fq2],
+                    "iva -t $CPUS $SOURCES {}".format(iva_dir),
+                    rmdir=iva_dir,
+                    cpus=8)
 
-    SrunCommand(["{}/{}_cut_wRefs.fasta".format(shiver_dir, dataset),
-                 "{}/{}_raw_wRefs.fasta".format(shiver_dir, dataset),
-                 "{}/{}.blast".format(shiver_dir, dataset)],
-                ["lib/shiver-contigs.sh",
-                 Value(shiver_dir),
-                 "scratch/shiver/shiver_align_contigs.sh",
-                 "scratch/shiver/reference.log",
-                 "scratch/shiver/config.sh",
-                 "{}/contigs.fasta".format(iva_dir),
-                 Value(dataset)],
-                "bash $SOURCES",
-                rmdir=shiver_dir)
+        shiver_dir = "scratch/shiver.{}".format(dataset)
 
-    SrunCommand(["{}/{}_remap.bam".format(shiver_dir, dataset),
-                 "{}/{}_remap_ref.fasta".format(shiver_dir, dataset)],
-                ["lib/shiver-reads.sh",
-                 Value(shiver_dir),
-                 "scratch/shiver/shiver_map_reads.sh",
-                 "scratch/shiver/reference.log",
-                 "scratch/shiver/config.sh",
-                 "{}/contigs.fasta".format(iva_dir),
-                 Value(dataset),
-                 "{}/{}.blast".format(shiver_dir, dataset),
-                 "{}/{}_cut_wRefs.fasta".format(shiver_dir, dataset),
-                 fq1,
-                 fq2],
-                "bash $SOURCES")
+        SrunCommand(["{}/{}_cut_wRefs.fasta".format(shiver_dir, dataset),
+                     "{}/{}_raw_wRefs.fasta".format(shiver_dir, dataset),
+                     "{}/{}.blast".format(shiver_dir, dataset)],
+                    ["lib/shiver-contigs.sh",
+                     Value(shiver_dir),
+                     "scratch/shiver/shiver_align_contigs.sh",
+                     "scratch/shiver/reference.log",
+                     "scratch/shiver/config.sh",
+                     "{}/contigs.fasta".format(iva_dir),
+                     Value(dataset)],
+                    "bash $SOURCES",
+                    rmdir=shiver_dir)
+
+        SrunCommand(["{}/{}_remap.bam".format(shiver_dir, dataset),
+                     "{}/{}_remap_ref.fasta".format(shiver_dir, dataset)],
+                    ["lib/shiver-reads.sh",
+                     Value(shiver_dir),
+                     "scratch/shiver/shiver_map_reads.sh",
+                     "scratch/shiver/reference.log",
+                     "scratch/shiver/config.sh",
+                     "{}/contigs.fasta".format(iva_dir),
+                     Value(dataset),
+                     "{}/{}.blast".format(shiver_dir, dataset),
+                     "{}/{}_cut_wRefs.fasta".format(shiver_dir, dataset),
+                     fq1,
+                     fq2],
+                    "bash $SOURCES")
 
     ## hydra
 
@@ -185,7 +188,8 @@ for dataset, (fq1, fq2) in fastq.items():
     SrunCommand("{}/align.bam".format(hydra_dir),
                 [fq1, fq2],
                 "quasitools hydra -o {} $SOURCES".format(hydra_dir),
-                rmdir=hydra_dir)
+                rmdir=hydra_dir,
+                mem_per_cpu=8)
 
     ## bowtie2
 
@@ -211,22 +215,30 @@ for dataset, (fq1, fq2) in fastq.items():
 # Codon frequency tables
 
     ## hivmmer
+    if dataset == "PID":
+        # Use the first alignment for PID, since it is a sparse fragment with a
+        # gap, and the second sample-specific alignment is no longer in HXB2
+        # coordinates.
+        hmmsearch = 1
+    else:
+        hmmsearch = 2
 
     env.Command("results/{}.hivmmer.codons.csv".format(dataset),
-                "scratch/{}.hmmsearch2.codons.csv".format(dataset),
+                "scratch/{}.hmmsearch{}.codons.csv".format(dataset, hmmsearch),
                 "cp $SOURCE $TARGET")
 
     env.Command("results/{}.hivmmer.aavf".format(dataset),
-                "scratch/{}.hmmsearch2.aavf".format(dataset),
+                "scratch/{}.hmmsearch{}.aavf".format(dataset, hmmsearch),
                 "cp $SOURCE $TARGET")
 
     ## shiver
 
-    SrunCommand("results/{}.shiver.codons.csv".format(dataset),
-                ["lib/pileup.py",
-                 Value(0),
-                 "{}/{}_remap.bam".format(shiver_dir, dataset)],
-                "python $SOURCES $TARGET")
+    if dataset != "PID":
+        SrunCommand("results/{}.shiver.codons.csv".format(dataset),
+                    ["lib/pileup.py",
+                     Value(0),
+                     "{}/{}_remap.bam".format(shiver_dir, dataset)],
+                    "python $SOURCES $TARGET")
 
     ## hydra
 
@@ -244,9 +256,10 @@ for dataset, (fq1, fq2) in fastq.items():
                  "scratch/bowtie2.{}.bam".format(dataset)],
                 "python $SOURCES $TARGET")
 
-    env.Command("results/{}.coverage.tsv".format(dataset),
-                "scratch/bowtie2.{}.bam".format(dataset),
-                "samtools view -f 3 $SOURCE | cut -f 4,6,9 > $TARGET")
+    if dataset == "5VM":
+        env.Command("results/{}.coverage.tsv".format(dataset),
+                    "scratch/bowtie2.{}.bam".format(dataset),
+                    "samtools view -f 3 $SOURCE | cut -f 4,6,9 > $TARGET")
 
     ## bowtie2-pear
 
@@ -256,13 +269,44 @@ for dataset, (fq1, fq2) in fastq.items():
                  "scratch/bowtie2-pear.{}.bam".format(dataset)],
                 "python $SOURCES $TARGET")
 
+## pidalyse
+
+env.Command("results/PID.pidalyse.codons.csv",
+            ["lib/pid-codons.py",
+             "scratch/primer-id-5vm/3223a_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3223b_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3223c_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3236a_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3236b_QC_1_cons.fasta",
+             "scratch/primer-id-5vm/3236c_QC_1_cons.fasta"],
+            "python $SOURCES > $TARGET")
+
+# Variant distributions
+
+for dataset in methods:
+
+    env.Command("results/{}.variants.csv".format(dataset),
+                ["lib/variants.py",
+                 "data/{}.ref.fa".format(dataset),
+                 Value(",".join(methods[dataset]))] + \
+                ["results/{}.{}.codons.csv".format(dataset, method)
+                 for method in methods[dataset]],
+                "python $SOURCES $TARGET")
+
+    env.Command("results/{}.variants.test.log".format(dataset),
+                ["lib/variants-test.py",
+                 "results/{}.variants.csv".format(dataset),
+                 Value(",".join(methods[dataset]))],
+                "python $SOURCES > $TARGET")
+
 # Figures
 
     ## Supplementary 1-4
 
+for dataset in methods:
     env.Command("results/{}-detail.eps".format(dataset),
                 ["lib/plot-detail.py", Value(dataset), "data/{}.ref.fa".format(dataset)] + \
-                ["results/{}.{}.codons.csv".format(dataset, method) for method in methods],
+                ["results/{}.{}.codons.csv".format(dataset, method) for method in methods[dataset]],
                 "python $SOURCES $TARGET")
 
 # Figure 1
@@ -273,10 +317,29 @@ env.Command("results/coverage.eps",
 
 # Figure 2
 
+datasets = ("5VM", "PL11", "PL19")
 env.Command("results/errors.eps",
-            ["lib/plot-errors.py", Value(",".join(fastq)), Value(",".join(methods))] + \
-            ["data/{}.ref.fa".format(dataset) for dataset in fastq] + \
-            ["results/{}.{}.codons.csv".format(dataset, method) for method in methods for dataset in fastq],
+            ["lib/plot-errors.py", Value(",".join(datasets)), Value(",".join(methods["5VM"]))] + \
+            ["data/{}.ref.fa".format(dataset)
+             for dataset in datasets] + \
+            ["results/{}.{}.codons.csv".format(dataset, method)
+             for method in methods["5VM"]
+             for dataset in datasets],
+            "python $SOURCES $TARGET")
+
+# Figure 3
+
+datasets = ("5VM", "PL11", "PL19")
+env.Command("results/variant-dist.eps",
+            ["lib/plot-variant-dist.py", Value(",".join(datasets)), Value(",".join(methods["5VM"]))] + \
+            ["results/{}.variants.csv".format(dataset) for dataset in datasets],
+            "python $SOURCES $TARGET")
+
+# Figure 4
+
+env.Command("results/primer-id.eps",
+            ["lib/plot-primer-id.py", "data/PID.ref.fa", "results/PID.variants.csv"] + \
+            ["results/PID.{}.codons.csv".format(method) for method in methods["PID"]],
             "python $SOURCES $TARGET")
 
 # vim: syntax=python expandtab sw=4 ts=4

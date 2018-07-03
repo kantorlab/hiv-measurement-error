@@ -26,7 +26,8 @@ def codon_table(fasta):
         if not ('N' in codon or '-' in codon):
           table[int((offset+i)/3), lookup[codon]] += 1
 
-  return pd.DataFrame(table, index=np.arange(nref), columns=codons)
+  np.savetxt(sys.stdout, table, fmt="%g", comments="",
+             delimiter=",", header=",".join(codons))
 
 if __name__ == "__main__":
-  codon_table(sys.argv[1:]).to_csv(sys.stdout, index_label="AA_Index")
+  codon_table(sys.argv[1:])

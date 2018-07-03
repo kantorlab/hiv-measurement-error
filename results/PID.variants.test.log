@@ -1,0 +1,7 @@
+FriedmanchisquareResult(statistic=58.29032258064456, pvalue=1.3627720407736152e-12)
+hivmmer pidalyse WilcoxonResult(statistic=666.0, pvalue=0.09826001280262796)
+hivmmer hydra WilcoxonResult(statistic=403.5, pvalue=5.387925468204801e-09)
+hivmmer bowtie2 WilcoxonResult(statistic=438.0, pvalue=3.124765672030304e-09)
+pidalyse hydra WilcoxonResult(statistic=526.0, pvalue=2.542023506965098e-09)
+pidalyse bowtie2 WilcoxonResult(statistic=540.0, pvalue=7.897359730371497e-10)
+hydra bowtie2 WilcoxonResult(statistic=526.0, pvalue=3.288151197550145e-08)

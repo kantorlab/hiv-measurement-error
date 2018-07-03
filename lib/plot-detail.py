@@ -35,11 +35,13 @@ norm_coverage = {}
 
 for method, f in zip(methods, csvfiles):
     codons[method] = pd.read_csv(f, nrows=xmax)
-    coverage[method] = codons[method].sum(axis=1)
-    norm_coverage[method] = 100.0 / coverage[method]
+    coverage[method] = codons[method].sum(axis=1).astype(np.float)
+    norm_coverage[method] = np.divide(100.0, coverage[method],
+                                      out=np.zeros_like(coverage[method]),
+                                      where=(coverage[method] != 0))
 
 ymax = max(coverage[method].max() for method in codons)
-ylim = (0, ymax)
+ylim = (0, int(ymax))
 
 fig, ax = plt.subplots(nrows=2*len(methods), sharex=True, figsize=(15,6*len(methods)),
                        gridspec_kw={"height_ratios": [1,4]*len(methods)})
