@@ -5,6 +5,8 @@ import sys
 from Bio import SeqIO
 from itertools import product
 
+freq_threshold = 0.01
+
 reffile  = sys.argv[1]
 methods  = sys.argv[2].split(",")
 csvfiles = sys.argv[3:-1]
@@ -39,7 +41,10 @@ for seq in SeqIO.parse(reffile, "fasta"):
 for method, csvfile in zip(methods, csvfiles):
   codons = pd.read_csv(csvfile)
   codons = codons.div(codons.sum(axis=1), axis=0)
+  codons[codons < freq_threshold] = 0
+  codons = codons.div(codons.sum(axis=1), axis=0)
   for i, codon in variants.index:
     variants.loc[(i, codon), method] = codons.loc[i, codon]
+  print(method, "false negatives:", (variants.loc[variants.reference == 1, method] == 0).sum())
 
 variants.fillna(0).to_csv(outfile)

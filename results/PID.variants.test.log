@@ -1,7 +1,16 @@
-FriedmanchisquareResult(statistic=58.29032258064456, pvalue=1.3627720407736152e-12)
+FriedmanchisquareResult(statistic=59.138181818181216, pvalue=8.981460198043011e-13)
 hivmmer pidalyse WilcoxonResult(statistic=666.0, pvalue=0.09826001280262796)
 hivmmer hydra WilcoxonResult(statistic=403.5, pvalue=5.387925468204801e-09)
-hivmmer bowtie2 WilcoxonResult(statistic=438.0, pvalue=3.124765672030304e-09)
+hivmmer bowtie2 WilcoxonResult(statistic=396.5, pvalue=2.6606071394307137e-09)
 pidalyse hydra WilcoxonResult(statistic=526.0, pvalue=2.542023506965098e-09)
-pidalyse bowtie2 WilcoxonResult(statistic=540.0, pvalue=7.897359730371497e-10)
-hydra bowtie2 WilcoxonResult(statistic=526.0, pvalue=3.288151197550145e-08)
+pidalyse bowtie2 WilcoxonResult(statistic=489.0, pvalue=5.91872877623628e-10)
+hydra bowtie2 WilcoxonResult(statistic=412.0, pvalue=4.144473372567432e-09)
+[0.09826001280262796, 5.387925468204801e-09, 2.6606071394307137e-09, 2.542023506965098e-09, 5.91872877623628e-10, 4.144473372567432e-09]
+[4 3 2 5 1 0]
+[5 4 2 1 0 3]
+hivmmer pidalyse 0.09826001280262796
+hivmmer hydra 1.0775850936409603e-08
+hivmmer bowtie2 1.0642428557722855e-08
+pidalyse hydra 1.271011753482549e-08
+pidalyse bowtie2 3.5512372657417684e-09
+hydra bowtie2 1.2433420117702297e-08

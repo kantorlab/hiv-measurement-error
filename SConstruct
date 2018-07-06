@@ -36,7 +36,7 @@ env.Command("scratch/pol.hmm",
             "hmmbuild $TARGET $SOURCE")
 
 env.Command("scratch/pol.idx",
-            "data/hxb2.fa",
+            "data/hxb2-pol.fa",
             "bowtie2-build $SOURCE $TARGET > $TARGET")
 
 # Downloads
@@ -197,7 +197,7 @@ for dataset, (fq1, fq2) in fastq.items():
                 [Value("-x"), "scratch/pol.idx",
                  Value("-1"), fq1,
                  Value("-2"), fq2,
-                 Value("--no-mixed --no-discordant -X 10000")],
+                 Value("--very-sensitive-local -X 1400")],
                 "bowtie2 --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
                 cpus=8)
 
@@ -205,10 +205,10 @@ for dataset, (fq1, fq2) in fastq.items():
 
     SrunCommand("scratch/bowtie2-pear.{}.bam".format(dataset),
                 [Value("-x"), "scratch/pol.idx",
-                 Value("-1"), "scratch/{}.pear.unassembled.forward.fastq".format(dataset),
-                 Value("-2"), "scratch/{}.pear.unassembled.reverse.fastq".format(dataset),
+#                 Value("-1"), "scratch/{}.pear.unassembled.forward.fastq".format(dataset),
+#                 Value("-2"), "scratch/{}.pear.unassembled.reverse.fastq".format(dataset),
                  Value("-U"), "scratch/{}.pear.assembled.fastq".format(dataset),
-                 Value("--no-mixed --no-discordant -X 10000")],
+                 Value("--very-sensitive-local")],
                 "bowtie2 --threads $CPUS $SOURCES | samtools view -bS - > $TARGET",
                 cpus=8)
 
@@ -252,22 +252,23 @@ for dataset, (fq1, fq2) in fastq.items():
 
     SrunCommand("results/{}.bowtie2.codons.csv".format(dataset),
                 ["lib/pileup.py",
-                 Value(2252),
+                 Value(0),
                  "scratch/bowtie2.{}.bam".format(dataset)],
                 "python $SOURCES $TARGET")
 
     if dataset == "5VM":
         env.Command("results/{}.coverage.tsv".format(dataset),
                     "scratch/bowtie2.{}.bam".format(dataset),
-                    "samtools view -f 3 $SOURCE | cut -f 4,6,9 > $TARGET")
+                    "samtools view -f 3 $SOURCE | cut -f 4,9 > $TARGET")
 
     ## bowtie2-pear
 
-    SrunCommand("results/{}.bowtie2-pear.codons.csv".format(dataset),
-                ["lib/pileup.py",
-                 Value(2252),
-                 "scratch/bowtie2-pear.{}.bam".format(dataset)],
-                "python $SOURCES $TARGET")
+    if dataset != "PID":
+        SrunCommand("results/{}.bowtie2-pear.codons.csv".format(dataset),
+                    ["lib/pileup.py",
+                     Value(0),
+                     "scratch/bowtie2-pear.{}.bam".format(dataset)],
+                    "python $SOURCES $TARGET")
 
 ## pidalyse
 
@@ -293,11 +294,23 @@ for dataset in methods:
                  for method in methods[dataset]],
                 "python $SOURCES $TARGET")
 
+    env.Command("results/{}.variants.thresholded.csv".format(dataset),
+                ["lib/variants-threshold.py",
+                 "data/{}.ref.fa".format(dataset),
+                 Value(",".join(methods[dataset]))] + \
+                ["results/{}.{}.codons.csv".format(dataset, method)
+                 for method in methods[dataset]],
+                "python $SOURCES $TARGET")
+
     env.Command("results/{}.variants.test.log".format(dataset),
                 ["lib/variants-test.py",
-                 "results/{}.variants.csv".format(dataset),
+                 "results/{}.variants.thresholded.csv".format(dataset),
                  Value(",".join(methods[dataset]))],
                 "python $SOURCES > $TARGET")
+
+    env.Command("results/{}.top-errors.csv".format(dataset),
+                ["lib/top-errors.py", "results/{}.variants.csv".format(dataset), Value(",".join(methods[dataset]))],
+                "python $SOURCES $TARGET")
 
 # Figures
 
@@ -332,13 +345,13 @@ env.Command("results/errors.eps",
 datasets = ("5VM", "PL11", "PL19")
 env.Command("results/variant-dist.eps",
             ["lib/plot-variant-dist.py", Value(",".join(datasets)), Value(",".join(methods["5VM"]))] + \
-            ["results/{}.variants.csv".format(dataset) for dataset in datasets],
+            ["results/{}.variants.thresholded.csv".format(dataset) for dataset in datasets],
             "python $SOURCES $TARGET")
 
 # Figure 4
 
 env.Command("results/primer-id.eps",
-            ["lib/plot-primer-id.py", "data/PID.ref.fa", "results/PID.variants.csv"] + \
+            ["lib/plot-primer-id.py", "data/PID.ref.fa", "results/PID.variants.thresholded.csv"] + \
             ["results/PID.{}.codons.csv".format(method) for method in methods["PID"]],
             "python $SOURCES $TARGET")
 

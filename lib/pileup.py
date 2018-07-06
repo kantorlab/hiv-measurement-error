@@ -16,6 +16,7 @@ nreads = 0
 npassed = 0
 for aln in pysam.Samfile(sys.argv[2], "rb").fetch(until_eof=True):
   nreads += 1
+  reference_start = aln.reference_start - offset
   if not (aln.is_unmapped or 'I' in aln.cigar or 'D' in aln.cigar):
     npassed += 1
     reference_start = aln.reference_start - offset

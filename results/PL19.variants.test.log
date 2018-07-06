@@ -1,11 +1,24 @@
-FriedmanchisquareResult(statistic=106.10896898574963, pvalue=4.915434059765238e-22)
+FriedmanchisquareResult(statistic=0.12551159617944654, pvalue=0.9981113316769471)
 hivmmer shiver WilcoxonResult(statistic=1310.5, pvalue=0.9843297224266748)
 hivmmer hydra WilcoxonResult(statistic=1322.0, pvalue=0.8754963103857807)
-hivmmer bowtie2 WilcoxonResult(statistic=1366.0, pvalue=9.18562922897885e-15)
-hivmmer bowtie2-pear WilcoxonResult(statistic=1332.0, pvalue=1.3036837408468267e-06)
+hivmmer bowtie2 WilcoxonResult(statistic=1328.0, pvalue=0.7485568428565467)
+hivmmer bowtie2-pear WilcoxonResult(statistic=1314.0, pvalue=1.0)
 shiver hydra WilcoxonResult(statistic=1315.5, pvalue=0.8474161425995426)
-shiver bowtie2 WilcoxonResult(statistic=1541.0, pvalue=1.31511806180882e-13)
-shiver bowtie2-pear WilcoxonResult(statistic=1417.0, pvalue=4.761982032177404e-06)
-hydra bowtie2 WilcoxonResult(statistic=1347.5, pvalue=6.8852376553017246e-15)
-hydra bowtie2-pear WilcoxonResult(statistic=1222.0, pvalue=1.3266771680660685e-07)
-bowtie2 bowtie2-pear WilcoxonResult(statistic=1212.5, pvalue=8.077339057039926e-16)
+shiver bowtie2 WilcoxonResult(statistic=1318.0, pvalue=0.7080931077153096)
+shiver bowtie2-pear WilcoxonResult(statistic=1314.0, pvalue=1.0)
+hydra bowtie2 WilcoxonResult(statistic=1343.0, pvalue=0.8105346554616599)
+hydra bowtie2-pear WilcoxonResult(statistic=1312.0, pvalue=0.8323736183266025)
+bowtie2 bowtie2-pear WilcoxonResult(statistic=1313.5, pvalue=0.690143361579564)
+[0.9843297224266748, 0.8754963103857807, 0.7485568428565467, 1.0, 0.8474161425995426, 0.7080931077153096, 1.0, 0.8105346554616599, 0.8323736183266025, 0.690143361579564]
+[9 5 2 7 8 4 1 0 3 6]
+[7 6 2 8 5 1 9 3 4 0]
+hivmmer shiver 1.0
+hivmmer hydra 1.0
+hivmmer bowtie2 1.0
+hivmmer bowtie2-pear 1.0
+shiver hydra 1.0
+shiver bowtie2 1.0
+shiver bowtie2-pear 1.0
+hydra bowtie2 1.0
+hydra bowtie2-pear 1.0
+bowtie2 bowtie2-pear 1.0

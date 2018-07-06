@@ -59,12 +59,11 @@ plt.figure(figsize=(6*len(datasets),6))
 for i, dataset in enumerate(datasets):
   plt.subplot(1, len(datasets), i+1)
   plt.title(dataset, fontsize=20)
-  plt.xlim([1, 3])
+  plt.xlim([-np.log10(0.02), 3])
   plt.xticks(
-      [1, -np.log10(0.05), -np.log10(0.02), 2, -np.log10(0.005), -np.log10(0.0025), 3],
-      ["10%", "5%", "2%", "1%", "0.5%", "0.25%", "0.1%"])
-  plt.ylim((-50, 1600))
-  plt.axvline(2, c="k", lw=0.5)
+      [-np.log10(0.02), 2, -np.log10(0.005), -np.log10(0.0025), 3],
+      ["2%", "1%", "0.5%", "0.25%", "0.1%"])
+  plt.ylim((-50, 2200))
   x, y = load_data(reffiles[i], csvfiles[i::len(datasets)])
   for method in methods:
     plt.plot(x[method], y[method], label=method)

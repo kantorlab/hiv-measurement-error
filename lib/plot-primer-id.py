@@ -57,12 +57,11 @@ plt.figure(figsize=(12,6))
 plt.subplot(1, 2, 1)
 plt.title("Cumulative Errors", fontsize=20)
 
-plt.xlim([1, 3])
+plt.xlim([-np.log10(0.05), 3])
 plt.xticks(
-  [1, -np.log10(0.05), -np.log10(0.02), 2, -np.log10(0.005), -np.log10(0.0025), 3],
-  ["10%", "5%", "2%", "1%", "0.5%", "0.25%", "0.1%"])
+  [-np.log10(0.05), -np.log10(0.02), 2, -np.log10(0.005), -np.log10(0.0025), 3],
+  ["5%", "2%", "1%", "0.5%", "0.25%", "0.1%"])
 plt.ylim((-25, 700))
-plt.axvline(2, c="k", lw=0.5)
 x, y = load_data()
 for method in methods:
   plt.plot(x[method], y[method], label=method)
