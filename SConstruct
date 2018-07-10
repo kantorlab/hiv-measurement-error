@@ -355,4 +355,27 @@ env.Command("results/primer-id.eps",
             ["results/PID.{}.codons.csv".format(method) for method in methods["PID"]],
             "python $SOURCES $TARGET")
 
+# Read counts
+
+for dataset in methods:
+    SrunCommand("results/{}.hivmmer_read_count.log".format(dataset),
+                ["lib/hivmmer-count.py",
+                 "scratch/{}.hmmsearch2.txt".format(dataset)],
+                "python $SOURCES > $TARGET",
+                mem_per_cpu=8)
+    SrunCommand("results/{}.hydra_read_count.log".format(dataset),
+                "scratch/hydra.{}/align.bam".format(dataset),
+                "samtools flagstat $SOURCE > $TARGET")
+    SrunCommand("results/{}.bowtie2_read_count.log".format(dataset),
+                "scratch/bowtie2.{}.bam".format(dataset),
+                "samtools flagstat $SOURCE > $TARGET")
+
+for dataset in datasets:
+    SrunCommand("results/{}.shiver_read_count.log".format(dataset),
+                "scratch/shiver.{0}/{0}_remap.bam".format(dataset),
+                "samtools flagstat $SOURCE > $TARGET")
+    SrunCommand("results/{}.bowtie2-pear_read_count.log".format(dataset),
+                "scratch/bowtie2-pear.{}.bam".format(dataset),
+                "samtools flagstat $SOURCE > $TARGET")
+
 # vim: syntax=python expandtab sw=4 ts=4
