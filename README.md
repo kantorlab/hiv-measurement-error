@@ -62,6 +62,7 @@ as release "3.0.1-hotfix1".
 * [samtools](https://github.com/samtools/samtools) 1.3.1
 * [scipy](https://www.scipy.org/) 1.1.0
 * [scons](https://github.com/mhowison/scons/releases) 3.0.1-hotfix1
+* [seaborn](https://seaborn.pydata.org) 0.8.1
 * [smalt](http://www.sanger.ac.uk/science/tools/smalt-0) 0.7.6
 * [trimmomatic](http://www.usadellab.org/cms/?page=trimmomatic) 0.36
 
