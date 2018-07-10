@@ -1,6 +1,6 @@
 ##fileformat=AAVFv1.0
-##fileDate=20180702 12:50:27
-##source=hivmmer-0.1.1
+##fileDate=20180709 12:39:09
+##source=hivmmer-0.1.2
 ##reference=scratch/PID.hmmsearch1.ref.consensus.fa
 ##INFO=<ID=AC,Number=.,Type=String,Description="Alternate Codon">
 ##INFO=<ID=ACC,Number=.,Type=Float,Description="Alternate Codon Count, for each Alternate Codon, in the same order as listed.">
