@@ -82,6 +82,17 @@ The run order and dependencies of the scripts are specified in the SConstruct
 file.  The entire analysis can be run by executing the `scons` command from the
 root directory of the repo.
 
+One of the python packages used by HyDRA (the "click" package) may require you to
+set additional environment variables for compatability with python3:
+
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
+
+or possibly:
+
+    export LANG=en_US.utf-8
+    export LC_ALL=en_US.utf-8
+
 Several steps require extensive compute and memory resources, and the analysis is best
 run on a compute cluster, where it can be parallelized by SCons. To run the analysis
 on a compute cluster that uses the [SLURM](https://slurm.schedmd.com/) batch
