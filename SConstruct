@@ -9,10 +9,11 @@ env.CacheDir("cache")
 methods = ["hivmmer", "shiver", "hydra", "bowtie2", "bowtie2-pear"]
 methods = {"5VM": methods, "PL11": methods, "PL19": methods, "PID": ["hivmmer", "pidalyse", "hydra", "bowtie2"]}
 
-# Use the SLURM scheduler to run jobs by default. If you do not have SLURM, set
-# the command to None to disable.
-srun = "srun"
-#srun = None
+# Uncomment the second line to use the SLURM scheduler to run tasks in parallel.
+# If your SLURM culster requires additional parameters, you can include them in
+# this command.
+srun = None
+#srun = "srun"
 
 def SrunCommand(targets, sources, cmd, rmdir="", cpus=1, mem_per_cpu=3, timelimit="24:00:00"):
     global srun, env
