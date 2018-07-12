@@ -10,8 +10,8 @@ An Ubuntu 16.04-based Docker image with all prequisites installed is available
 from [DockerHub](https://hub.docker.com/r/kantorlab/hiv-measurement-error). *If
 you choose to use the Docker image, please read the notes about resource
 requirements in the "Running" section below. In particular, you may need to
-adjust the memory settings in Docker to allow for at least
-10GB of memory.*
+adjust the advanced settings in Docker to allow for at least
+10GB of memory and 100GB of disk space.*
 
 The scripts have been tested on CentOS 6.8 and Ubuntu 16.04, but may work on
 other distributions of 64-bit Linux.
@@ -109,7 +109,7 @@ to the `srun` variable in SConstruct.
 
 Overall, the entire analysis requires approximately 100 CPU-hours and the
 maximum memory required for any step is approximately 10GB. **On a single
-workstation, this means the entire analysis could take around a week to run**.
+workstation, this means the entire analysis could take several days to run**.
 Therefore, we recommend you run the analysis on a compute cluster if possible.
 The majority of compute time is required for pidalign/pidalyse and IVA/shiver,
 and you may see long pauses during those steps.
@@ -131,7 +131,7 @@ example, on our compute cluster, we achieve this with:
 
 where `/gpfs/scratch` is a high-performance file system.
 
-The total scratch storage used by the entire analysis is around 40GB.
+The total scratch storage used by the entire analysis is around 44GB.
 
 ### Results
 
