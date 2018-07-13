@@ -43,7 +43,7 @@ env.Command("scratch/pol.idx",
 # Downloads
 
 env.Command("scratch/primer-id-5vm.zip",
-            Value("https://ndownloader.figshare.com/articles/6713132?private_link=2eadd6e5611560150126"),
+            Value("https://ndownloader.figshare.com/articles/6713132/versions/1"),
             "wget -O $TARGET $SOURCE")
 
 env.Command("scratch/shiver-1.4.1.zip",
