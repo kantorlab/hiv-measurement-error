@@ -1,8 +1,8 @@
 Scripts to reproduce results in the manuscript:
 
-M Howison, M Coetzer, R Kantor. 2018. Measurement error and variant-calling in
-deep Illumina sequencing of HIV.  *bioRxiv* 276576.
-doi:[10.1101/276576](https://doi.org/10.1101/276576)
+Howison M, Coetzer M, Kantor R. 2019. Measurement error and variant-calling in
+deep Illumina sequencing of HIV. *Bioinformatics* **35**(12): 2029-2035.
+doi:[10.1093/bioinformatics/bty919](https://doi.org/10.1093/bioinformatics/bty919)
 
 ## Install
 
